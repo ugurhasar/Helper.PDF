@@ -14,24 +14,29 @@ namespace Quick.Assistant.Pdf.Test
         static void Main(string[] args)
         {
             PdfProcess pdfProcess = new PdfProcess();
-            Stream stream = File.Open(@"D:\existingPlusFields-2.pdf", FileMode.Open);
+            Stream stream = File.Open(@"D:\score_card.pdf", FileMode.Open);
+
+            MemoryStream memo = new MemoryStream();
 
             PdfReader reader = new PdfReader(stream);
-            PdfStamper pdfStamper = new PdfStamper(reader, new FileStream(@"D:\existingPlusFields-1.pdf", FileMode.Create));
+
+
+            ///PdfStamper pdfStamper = new PdfStamper(reader, new FileStream(@"D:\existingPlusFields-1.pdf", FileMode.Create));
+            PdfStamper pdfStamper = new PdfStamper(reader, memo);
+
             AcroFields pdfFormFields = pdfStamper.AcroFields;
+            //pdfStamper.Writer.PageEvent = new PageEventHelper();
 
-            pdfProcess.SetFieldValue(pdfStamper, "txtScoreCard", "");
+            ////pdfProcess.SetFieldValue(pdfStamper, "txtScoreCard", "");
 
-            string x =pdfFormFields.GetField("Alternatif__ube_Eikogd1msP2HElxT63ZxJw");
-            AcroFields.Item ite = pdfFormFields.GetFieldItem("Alternatif__ube_Eikogd1msP2HElxT63ZxJw");
-            PdfDictionary div = ite.GetWidget(0);
-            
+            ////string x =pdfFormFields.GetField("Alternatif__ube_Eikogd1msP2HElxT63ZxJw");
+            ////AcroFields.Item ite = pdfFormFields.GetFieldItem("Alternatif__ube_Eikogd1msP2HElxT63ZxJw");
+            ////PdfDictionary div = ite.GetWidget(0);
 
+            ////Font font = FontFactory.GetFont("C:\\WINDOWS\\Fonts\\arial.ttf", "CP1254", true, 8, Font.NORMAL, BaseColor.BLACK);
+            ////pdfFormFields.SetFieldProperty("Desc_", "textfont",bold, null);
 
-            //Font font = FontFactory.GetFont("C:\\WINDOWS\\Fonts\\arial.ttf", "CP1254", true, 8, Font.NORMAL, BaseColor.BLACK);
-            //pdfFormFields.SetFieldProperty("Desc_", "textfont",bold, null);
-
-            Rectangle rec = pdfProcess.GetFieldPostions(pdfStamper, "Alternatif__ube_Eikogd1msP2HElxT63ZxJw");
+            Rectangle rec = pdfProcess.GetFieldPostions(pdfStamper, "txtReference");
 
             PdfPTable table = new PdfPTable(5);
             table.WidthPercentage = 100;
@@ -50,114 +55,171 @@ namespace Quick.Assistant.Pdf.Test
             PdfPCell cell3_0 = pdfProcess.CreateCell(font, "Tavan Yüksekliği", new float[] { 8, 5, 0, 5 }, true);
             table.AddCell(cell3_0);
 
-            PdfPCell cell00_1 = pdfProcess.CreateCell(font, "1", new float[] { 8, 5, 10, 5 }, false);
-            cell00_1.BorderWidthRight = 0.5f;
-            table.AddCell(cell00_1);
-            PdfPCell cell0_1 = pdfProcess.CreateCell(font, "-1", new float[] { 8, 5, 10, 5 }, false);
-            table.AddCell(cell0_1);
-            PdfPCell cell1_1 = pdfProcess.CreateCell(font, "100", new float[] { 8, 5, 10, 5 }, false);
-            table.AddCell(cell1_1);
-            PdfPCell cell2_1 = pdfProcess.CreateCell(font, "5", new float[] { 8, 5, 10, 5 }, false);
-            table.AddCell(cell2_1);
-            PdfPCell cell3_1 = pdfProcess.CreateCell(font, "3", new float[] { 8, 5, 10, 5 }, false);
-            table.AddCell(cell3_1);
+            Random random = new Random();
 
-            PdfPCell cell00_2 = pdfProcess.CreateCell(font, "2", new float[] { 8, 5, 10, 5 }, false);
-            cell00_2.BorderWidthRight = 0.5f;
-            table.AddCell(cell00_2);
-            PdfPCell cell0_2 = pdfProcess.CreateCell(font, "0", new float[] { 8, 5, 10, 5 }, false);
-            table.AddCell(cell0_2);
-            PdfPCell cell1_2 = pdfProcess.CreateCell(font, "100", new float[] { 8, 5, 10, 5 }, false);
-            table.AddCell(cell1_2);
-            PdfPCell cell2_2 = pdfProcess.CreateCell(font, "6", new float[] { 8, 5, 10, 5 }, false);
-            table.AddCell(cell2_2);
-            PdfPCell cell3_2 = pdfProcess.CreateCell(font, "3", new float[] { 8, 5, 10, 5 }, false);
-            table.AddCell(cell3_2);
+            for (int i = 1; i < 100; i++)
+            {
+                PdfPCell cell00_1 = pdfProcess.CreateCell(font, i.ToString(), new float[] { 8, 5, 10, 5 }, false);
+                cell00_1.BorderWidthRight = 0.5f;
+                table.AddCell(cell00_1);
+                PdfPCell cell0_1 = pdfProcess.CreateCell(font, (i - 10).ToString(), new float[] { 8, 5, 10, 5 }, false);
+                table.AddCell(cell0_1);
+                PdfPCell cell1_1 = pdfProcess.CreateCell(font, random.Next(80, 200).ToString(), new float[] { 8, 5, 10, 5 }, false);
+                table.AddCell(cell1_1);
+                PdfPCell cell2_1 = pdfProcess.CreateCell(font, random.Next(2, 10).ToString(), new float[] { 8, 5, 10, 5 }, false);
+                table.AddCell(cell2_1);
+                PdfPCell cell3_1 = pdfProcess.CreateCell(font, random.Next(2, 10).ToString(), new float[] { 8, 5, 10, 5 }, false);
+                table.AddCell(cell3_1);
+            }
 
-            PdfPCell cell00_3 = pdfProcess.CreateCell(font, "3", new float[] { 8, 5, 10, 5 }, false);
-            cell00_3.BorderWidthRight = 0.5f;
-            table.AddCell(cell00_3);
-            PdfPCell cell0_3 = pdfProcess.CreateCell(font, "Asma Kat", new float[] { 8, 5, 10, 5 }, false);
-            table.AddCell(cell0_3);
-            PdfPCell cell1_3 = pdfProcess.CreateCell(font, "100", new float[] { 8, 5, 10, 5 }, false);
-            table.AddCell(cell1_3);
-            PdfPCell cell2_3 = pdfProcess.CreateCell(font, "3", new float[] { 8, 5, 10, 5 }, false);
-            table.AddCell(cell2_3);
-            PdfPCell cell3_3 = pdfProcess.CreateCell(font, "1,5", new float[] { 8, 5, 10, 5 }, false);
-            table.AddCell(cell3_3);
+            table.SetTotalWidth(new float[] { 40, 90, 90, 150, 150 });
 
-            PdfContentByte pdfContentByte = pdfStamper.GetOverContent(1);
-            //pdfContentByte.Add(table); 
+            Document document = new Document(PageSize.A4, 25, 25, 50, 50);
+            MemoryStream tableMemo = new MemoryStream();
 
-            table.SetTotalWidth(new float[] { 20, 100, 100, 150, 150 });
-            table.WriteSelectedRows(0, -1, 35, rec.Top - 40, pdfContentByte);
+            PdfWriter pdfWriter = PdfWriter.GetInstance(document, tableMemo);
+            pdfWriter.CloseStream = false;
+            pdfWriter.PageEvent = new PageEventHelper();
+
+            document.Open();
+
+            document.Add(table);
+
+            MemoryStream memil = new MemoryStream();
+            PdfCopy writer = new PdfCopy(document, memo);
+
+            int n = reader.NumberOfPages;
+            // add content, page-by-page
+
+            PdfImportedPage page;
+            for (int p = 0; p < n; )
+            {
+                ++p;
+                page = writer.GetImportedPage(reader, p);
+
+                writer.AddPage(page);
+            }
+
+            document.Close();
+
+            //int n = reader.NumberOfPages;
+            //PdfContentByte pdfContentByte = null;
+            //BaseFont bf = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.EMBEDDED);
+
+
+
+            //for (int i = 1; i <= n; i++)
+            //{
+            //    pdfContentByte = pdfStamper.GetOverContent(i);
+            //    pdfContentByte.BeginText();
+
+            //    if (i == 1)
+            //    {
+            //        pdfContentByte.SetFontAndSize(bf, 18);
+            //        pdfContentByte.SetTextMatrix(30, 750);
+            //        pdfContentByte.ShowText("Score Card (SCA-1)");
+            //    }
+
+            //    pdfContentByte.SetFontAndSize(bf, 10);
+            //    pdfContentByte.SetTextMatrix(550, 30);
+            //    pdfContentByte.ShowText(i.ToString());
+            //    pdfContentByte.EndText();
+            //}
+
+            ////pdfStamper.InsertPage(4, reader.GetPageSize(3));
+            ////pdfContentByte = pdfStamper.GetOverContent(3);
+
+
+
+            //Document document = new Document(PageSize.A4, 25, 25, 20, 50);
+
+            //memo.Position = 0;
+            //var copy = new PdfCopy(document, memo);
+            //copy.SetMergeFields();
+            //document.Open();
+
+            //MemoryStream memot = new MemoryStream();
+            ////memot.Write(memo.ToArray(), 0, memo.ToArray().Length);
+            ////memot.Position = 0;
+
+            //PdfWriter pdfWriter = PdfWriter.GetInstance(document, memot);
+            //pdfWriter.CloseStream = false;
+            //pdfWriter.PageEvent = new PageEventHelper();
+
+            //document.Open();
+
+            ////PdfPTable pdfPTable = CreateListTable(ratingReportItems);
+
+            //document.Add(table);
+            //document.Close();
+
             //pdfStamper.Close();
-            //BaseFont baseFont = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.CP1250, BaseFont.NOT_EMBEDDED);
-            //pdfContentByte.SetColorFill(BaseColor.BLUE);
-            //pdfContentByte.SetFontAndSize(baseFont, 8);
 
+            ////byte[] bytes = pdfProcess.Write(null);
 
-            //pdfContentByte.BeginText();
-            //pdfContentByte.ShowText("Kevin Cheng - A Hong Kong actor");
-            //pdfContentByte.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "Kevin Cheng - A Hong Kong actor", 50, 50, 0);
-            //pdfContentByte.ShowTextAligned(PdfContentByte.ALIGN_CENTER, "Kevin Cheng - A Hong Kong actor", 400, 600, 0);
-            //pdfContentByte.EndText();
-            //pdfStamper.Close();
-            //ct.AddElement(table);
-            //PageEventHelper pdfCreator = new PageEventHelper();
+            //File.WriteAllBytes("D:\\itextsharp.pdf", memot.ToArray());
 
-            //    
+            //Document document = null;
+            //PdfCopy writer = null;
+            //MemoryStream stre = new MemoryStream();
+            //try
+            //{
+            //    document = new Document();
+            //    writer = new PdfCopy(document, stre);
 
-            //    PdfPTable table = new PdfPTable(2);
-            //    table.WidthPercentage = 100;
-            //    table.SetWidths(new float[] { 0.2f, 0.8f});
+            //    writer.PageEvent = new PageEventHelper();
+            //    document.Open();
 
-            //    PdfPCell cell0 = pdfCreator.CreateCell(font, "#", new float[] { 10, 5, 10, 5 }, true, 0);
-            //    table.AddCell(cell0);
-            //    PdfPCell cell1 = pdfCreator.CreateCell(font, "Show", new float[] { 10, 5, 10, 5 }, true, 0);
-            //    table.AddCell(cell1);
-            //    table.DefaultCell.Border = 0;
+            //    PdfReader reader = new PdfReader(stream);
+            //    int n = reader.NumberOfPages;
+            //    // add content, page-by-page
 
-            //    //for (int i = 0; i < ratingReportItems.Length; i++)
-            //    //{
-            //    //    if (ratingReportItems[i].TotalValue == 0)
-            //    //        continue;
+            //    PdfImportedPage page;
+            //    for (int p = 0; p < n; )
+            //    {
+            //        ++p;
+            //        page = writer.GetImportedPage(reader, p);
 
-            //    //    table.AddCell(pdfCreator.CreateCell(font, (i + 1).ToString(), new float[] { 0, 5, 0, 5 }, false, i));
-            //    //    table.AddCell(pdfCreator.CreateCell(font, ratingReportItems[i].Title, new float[] { 0, 5, 0, 5 }, false, i));
-            //    //    table.AddCell(pdfCreator.CellImage(ratingReportItems[i].Channels, i));
-            //    //    table.AddCell(pdfCreator.CreateCell(font, string.Concat(ratingReportItems[i].UniquePercentage.ToString("G4", new CultureInfo("en-US")), " %"), new float[] { 0, 5, 0, 0 }, false, i));
-            //    //    table.AddCell(pdfCreator.CreateCell(font, ratingReportItems[i].TotalValue.ToString("#,##0", new CultureInfo("en-US")), new float[] { 0, 5, 0, 0 }, false, i));
-            //    //}
+            //        writer.AddPage(page);
+            //    }
 
-            //    return table;
-
-
-            //AcroFields.FieldPosition fieldPosition = pdfStamper.AcroFields.GetFieldPositions("Alternatif__ube_Eikogd1msP2HElxT63ZxJw").FirstOrDefault();
-
-            //float top = 0, right = 0, bottom = 0, left = 0;
-
-            //pdfProcess.GetFieldPostions(pdfStamper, "Alternatif__ube_Eikogd1msP2HElxT63ZxJw", out top, out right, out bottom, out left);
-
-            //Rectangle rec = fieldPosition.position;
-            //rec.Top = top + 100;
-            //rec.Bottom = bottom - 100;
-            //rec.Left = left;
-            //rec.Right = right;
-
-            //pdfProcess.CreateTextField(pdfStamper, rec, "test", "test", 1);
-            //TextField field = new TextField(pdfStamper.Writer, new iTextSharp.text.Rectangle(40, 500, 360, 530), "some_text");
-
-            // add the field here, the second param is the page you want it on         
-            //pdfStamper.AddAnnotation(field.GetTextField(), 1);
-            //pdfFormFields.SetField("Score_Card_V6XJ8AHF0Wgkcr2GSsQGww", "mobidik canım");
-            //IList<iTextSharp.text.pdf.AcroFields.FieldPosition> x = pdfFormFields.GetFieldPositions("Score_Card_V6XJ8AHF0Wgkcr2GSsQGww");
-            pdfStamper.Close();
-
-            //byte[] bytes = pdfProcess.Write(null);
-
-            //File.WriteAllBytes("D:\\itextsharp.pdf", bytes);
+            //    document.Add(table);
+            //}
+            //catch
+            //{
+            //    throw;
+            //}
+            //finally
+            //{
+            //    if (document != null && document.IsOpen()) document.Close();
+            //}
+            //File.WriteAllBytes("D:\\itextsharp.pdf", stre.ToArray());
         }
+
+        static void CreateMergedPDF(string targetPDF, string sourceDir)
+        {
+            using (FileStream stream = new FileStream(targetPDF, FileMode.Create))
+            {
+                Document pdfDoc = new Document(PageSize.A4);
+                PdfCopy pdf = new PdfCopy(pdfDoc, stream);
+                pdfDoc.Open();
+                var files = Directory.GetFiles(sourceDir);
+                Console.WriteLine("Merging files count: " + files.Length);
+                int i = 1;
+                foreach (string file in files)
+                {
+                    Console.WriteLine(i + ". Adding: " + file);
+                    pdf.AddDocument(new PdfReader(file));
+                    i++;
+                }
+
+                if (pdfDoc != null)
+                    pdfDoc.Close();
+
+                Console.WriteLine("SpeedPASS PDF merge complete.");
+            }
+        }
+
         public static void Mobidik(PdfReader reader)
         {
             FileStream _out = new FileStream(@"D:\existingPlusFields.pdf", FileMode.Create, FileAccess.Write);
