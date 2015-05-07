@@ -11,6 +11,19 @@ namespace Quick.Assistant.Pdf
 {
     public class PdfProcess : BaseManager
     {
+        public BaseFont baseFont = null;
+        public Font font = null;
+        //public Font font = FontFactory.GetFont("C:\\WINDOWS\\Fonts\\arial.ttf", "CP1254", true, 8, Font.NORMAL, BaseColor.BLACK);
+
+        public float DocumentTopMargin = 50f;
+        public float DocumentBottomMargin = 50f;
+
+        public PdfProcess()
+        {
+            this.baseFont = BaseFont.CreateFont("C:\\WINDOWS\\Fonts\\arial.ttf", BaseFont.CP1252, true);
+            this.font = new Font(baseFont, 8, Font.NORMAL, BaseColor.BLACK);
+        }
+
         public void CreateTextField(PdfStamper pdfStamper, Rectangle box, string fieldName, string text, int page)
         {
             TextField field = new TextField(pdfStamper.Writer, box, fieldName);
@@ -34,26 +47,74 @@ namespace Quick.Assistant.Pdf
             return fieldPosition.position;
         }
 
-        //public byte[] Write(DocumentInfo documentInfo) 
-        //{
-        //    MemoryStream memoryStream = new MemoryStream();
+        public void AddPageNumaber(PdfReader pdfReader, PdfStamper pdfStamper)
+        {
+            int totalPage = pdfReader.NumberOfPages;
+            int counter = 1;
 
-        //    using (Document document = this.CreateDocumentInfo(documentInfo))
-        //    {
-        //        PdfWriter pdfWriter = PdfWriter.GetInstance(document, memoryStream);
-        //        pdfWriter.CloseStream = false;
-        //        pdfWriter.PageEvent = new PageEventHelper();
+            PdfContentByte pdfContentByte = null;
 
-        //        document.Open(); 
+            while (counter <= pdfReader.NumberOfPages)
+            {
+                pdfContentByte = pdfStamper.GetOverContent(counter);
+                pdfContentByte.BeginText();
+                pdfContentByte.SetFontAndSize(baseFont, 10);
+                pdfContentByte.SetTextMatrix(575, 15);
+                pdfContentByte.ShowText(counter.ToString());
+                pdfContentByte.EndText();
 
-        //        PdfPTable pdfPTable = CreateListTable();
+                counter++;
+            }
+        }
 
-        //        document.Add(pdfPTable);
-        //        document.Close();
-        //    }
+        public void AddHeader(PdfReader pdfReader, PdfStamper pdfStamper, string text, int pageNumber = 1)
+        {
+            PdfContentByte pdfContentByte = pdfStamper.GetOverContent(pageNumber);
+            pdfContentByte.BeginText();
 
-        //    return memoryStream.ToArray();
-        //}
+            pdfContentByte.SetFontAndSize(baseFont, 18);
+            pdfContentByte.SetTextMatrix(35, 755);
+            pdfContentByte.ShowText(text);
+            pdfContentByte.EndText();
+        }
+
+        public void AddTableExistingDocument(PdfPTable pdfPTable, PdfReader pdfReader, PdfStamper pdfStamper, int currentpage, Rectangle referenceRec = null) 
+        {
+            int currentPageNumber = currentpage;
+            float pageHeight = pdfReader.GetPageSize(1).Height;
+
+            float rowHeight = pdfPTable.Rows.OrderByDescending(x => x.GetMaxRowHeightsWithoutCalculating()).FirstOrDefault().GetMaxRowHeightsWithoutCalculating();
+            float avaliableTotalArea = pageHeight - (this.DocumentTopMargin + this.DocumentBottomMargin);
+            int selectRowCount = (int)(avaliableTotalArea / rowHeight);
+
+            PdfContentByte pdfContentByte = null;
+            int firstSelectRowCount = 0;
+
+            if (referenceRec != null)
+            {
+                float avaliableFirstArea = referenceRec.Top - (this.DocumentTopMargin + this.DocumentBottomMargin);
+                firstSelectRowCount = (int)(avaliableFirstArea / rowHeight);
+
+                pdfContentByte = pdfStamper.GetOverContent(currentPageNumber);
+
+                pdfPTable.WriteSelectedRows(0, firstSelectRowCount, 40, referenceRec.Top - 40, pdfContentByte);
+            }
+
+            decimal totalPagePercentage = (decimal)(pdfPTable.Rows.Count - firstSelectRowCount) / selectRowCount;
+
+            for (int i = 0; i < totalPagePercentage; i++)
+            {
+                int startRowIndex = i * selectRowCount + firstSelectRowCount;
+                int endRowIndex = startRowIndex + selectRowCount;
+
+                currentPageNumber++;
+                pdfStamper.InsertPage(currentPageNumber, pdfReader.GetPageSize(1));
+
+                pdfContentByte = pdfStamper.GetOverContent(currentPageNumber);
+
+                pdfPTable.WriteSelectedRows(startRowIndex, endRowIndex, 40, pageHeight - this.DocumentBottomMargin, pdfContentByte);
+            }
+        }
 
         public Document CreateDocumentInfo(DocumentInfo documentInfo)
         {
@@ -75,9 +136,7 @@ namespace Quick.Assistant.Pdf
 
         public PdfPCell CreateCell(string text, float paddingTop, float paddingRight, float paddingBottom, float paddingLeft, bool isHeader = false)
         {
-            Font font = FontFactory.GetFont("C:\\WINDOWS\\Fonts\\arial.ttf", "CP1254", true, 8, Font.NORMAL, BaseColor.BLACK);
-
-            PdfPCell cell = new PdfPCell(new Phrase(text, font));
+            PdfPCell cell = new PdfPCell(new Phrase(text, this.font));
 
             cell.Border = 0;
 

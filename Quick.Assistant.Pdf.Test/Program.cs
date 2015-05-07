@@ -13,14 +13,19 @@ namespace Quick.Assistant.Pdf.Test
     {
         static void Main(string[] args)
         {
+//            var assembly = Assembly.GetExecutingAssembly();
+//var resourceName = "MyCompany.MyProduct.MyFile.txt";
+
+//using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+
             PdfProcess pdfProcess = new PdfProcess();
             Stream stream = File.Open(@"D:\score_card-1.pdf", FileMode.Open);
 
             MemoryStream memoryStream = new MemoryStream();
 
-            PdfReader reader = new PdfReader(stream);
+            PdfReader pdfReader = new PdfReader(stream);
 
-            PdfStamper pdfStamper = new PdfStamper(reader, memoryStream);
+            PdfStamper pdfStamper = new PdfStamper(pdfReader, memoryStream);
 
             AcroFields pdfFormFields = pdfStamper.AcroFields;
 
@@ -28,7 +33,6 @@ namespace Quick.Assistant.Pdf.Test
 
             PdfPTable table = new PdfPTable(5);
             table.WidthPercentage = 100;
-
 
             PdfPCell cell00_0 = pdfProcess.CreateCell("#", 0, 5, 8, 5, true);
             cell00_0.BorderWidthRight = 0.5f;
@@ -61,61 +65,9 @@ namespace Quick.Assistant.Pdf.Test
 
             table.SetTotalWidth(new float[] { 30, 95, 95, 150, 150 });
 
-            int currentPageNumber = 3;
-            float pageHeight = reader.GetPageSize(1).Height;
-            float yMargin = 50;
-
-            float rowHeight = table.Rows.OrderByDescending(x => x.GetMaxRowHeightsWithoutCalculating()).FirstOrDefault().GetMaxRowHeightsWithoutCalculating();
-            float avaliableTotalArea = pageHeight - (2 * yMargin);
-
-            float avaliableFirstArea = rec.Top - (2 * yMargin);
-
-            int selectRowCount = (int)(avaliableTotalArea / rowHeight);
-
-            int firstSelectRowCount = (int)(avaliableFirstArea / rowHeight);
-
-            PdfContentByte pdfContentByte = pdfStamper.GetOverContent(currentPageNumber);
-
-            table.WriteSelectedRows(0, firstSelectRowCount, 40, rec.Top - 40, pdfContentByte);
-
-            decimal totalPagePercentage = (decimal)(table.Rows.Count - 10) / 20;
-
-            for (int i = 0; i < totalPagePercentage; i++)
-            {
-                int startRowIndex = i * selectRowCount + firstSelectRowCount;
-                int endRowIndex = startRowIndex + selectRowCount;
-
-                currentPageNumber++;
-                pdfStamper.InsertPage(currentPageNumber, reader.GetPageSize(1));
-
-                pdfContentByte = pdfStamper.GetOverContent(currentPageNumber);
-
-                table.WriteSelectedRows(startRowIndex, endRowIndex, 40, pageHeight - yMargin, pdfContentByte);
-            }
-
-            BaseFont bf = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.EMBEDDED);
-
-            int totalPage = reader.NumberOfPages;
-            int counter = 1;
-            while (counter <= reader.NumberOfPages)
-            {
-                pdfContentByte = pdfStamper.GetOverContent(counter);
-                pdfContentByte.BeginText();
-
-                if (counter == 1)
-                {
-                    pdfContentByte.SetFontAndSize(bf, 18);
-                    pdfContentByte.SetTextMatrix(35, 760);
-                    pdfContentByte.ShowText("Score Card (SCA-1)");
-                }
-
-                pdfContentByte.SetFontAndSize(bf, 10);
-                pdfContentByte.SetTextMatrix(550, 20);
-                pdfContentByte.ShowText(counter.ToString());
-                pdfContentByte.EndText();
-
-                counter++;
-            }
+            pdfProcess.AddTableExistingDocument(table, pdfReader, pdfStamper, 3, rec);
+            pdfProcess.AddPageNumaber(pdfReader, pdfStamper);
+            pdfProcess.AddHeader(pdfReader, pdfStamper, "Score Card (SCA-1)");
 
             pdfStamper.Close();
 
