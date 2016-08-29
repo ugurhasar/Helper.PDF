@@ -1,0 +1,28 @@
+﻿body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 62.5%;
+}
+
+#wrapper {
+    display: block;
+    background: #fff;
+    margin: 0 auto;
+    padding: 10px 17px 10px 17px;
+}
+
+table {
+    width: 100%;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    height: 50px;
+    vertical-align: bottom;
+    border-bottom: 1px solid #ddd;
+}
